@@ -1,0 +1,21 @@
+image:
+  name: docker/compose:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - Build
+
+Build:
+  image: docker/compose:latest
+  services:
+    - docker:dind
+  stage: Build
+  before_script:
+    - docker info
+    - docker-compose --version
+  script:
+    - docker-compose build
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^(main)$/'

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>darklab.sh - tools</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style type="text/css">
+            .output-box {
+                height: calc( 100vh - 100px );
+                /* border-radius: 20px; */
+                background-color: black;
+                color: white;
+            }
+            .input-box {
+                height: calc( 100vh - 100px );
+                background-color: mistyrose;
+            }
+            .banner {
+                background-color: blueviolet;
+                color: white;
+                height: 100px;
+            }
+            .container {
+                max-width: 100%;
+                height: calc( 100vh - 100px );
+                /* padding: 0px 20px 20px; */
+            }
+            .param-box {
+                max-width: 400px;
+                margin: 50px auto 50px;
+            }
+            #output-inner-box {
+                height: calc( 100vh - 150px );
+            }
+        </style>
+    </head>
+    <body>
+        <div class="py-4 banner">
+            <h1 class="text-center">darklab.sh - tools</h1>
+        </div>
+        <div class="container">
+            <!-- <nav>
+                <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Project Tab 1</a>
+                    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Project Tab 2</a>
+                    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Project Tab 3</a>
+                </div>
+            </nav> -->
+            <div class="row">
+                <div class="col-sm-12 col-md-6 input-box">
+                    <form>
+                        <div class="row pt-4">
+                            <div class="col-md-2 offset-md-2 pt-2 text-right">
+                                <label for="command">Command : </label>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-control" id="command">
+                                    <option>whois</option>
+                                    <option>nslookup</option>
+                                    <option>dig</option>
+                                    <option>traceroute</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="div-whois" class="param-box">
+                            <div class="form-group">
+                                <label for="whois_domain_name">Domain name : </label>
+                                <input type="text" class="form-control" id="whois_domain_name" placeholder="google.com">
+                              </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary" id="btn-run">RUN</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-12 col-md-6 output-box">
+                    <div class="text-center mx-auto my-2">
+                        <pre style="color: white; font-size: 16px;">= = = = =    Output Box    = = = = =</pre>
+                    </div>
+                    <div id="output-inner-box"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        $(document).ready(function(){
+            $("#btn-run").click(function(){    
+                $.ajax({
+                    type : "POST", 
+                    url: "{% url 'whois_ip' %}",
+                    data: {
+                        ip_addr : $('#whois_domain_name').val(),
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        dataType: "json",
+                    },
+                    
+                    success: function(data){
+                        console.log(data);
+                    },
+                
+                    failure: function() {
+                        
+                    }
+                });
+            });
+        });
+    </script>
+</html>

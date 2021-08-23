@@ -1,0 +1,24 @@
+version: "3.8"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - tools_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=jkdfs87234
+      - POSTGRES_PASSWORD=ks67288*2
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  tools_db:
+    external: true

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>darklab.sh - tools</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  	<style type="text/css">
+  	body {
+	    color: black;
+    	background-color: grey;
+		font-weight: bold;
+		font-size: medium;
+		}
+		p {
+			padding: 0;
+			margin: 0;
+		}
+		.output_div {
+			background-color: dimgray;
+			text-align: left;
+			max-width: 50%;
+			font-weight: lighter;
+			word-wrap: break-word;
+		}
+  	</style>
+</head>
+<body>
+	<p>Domain Whois
+		<form id="form" method = "POST">
+			<label for="whois_ip">Domain Name: </label>
+			<input id="ip_addr" type="text" name="ip_addr">
+			<input name="sumit" type="submit" value="submit">
+		</form>	
+		Domain Name(s): 
+		<div class="output_div" id="domain_name"></div>
+		Organization:
+		<div class="output_div" id="org"></div>
+		Email(s):
+		<div class="output_div" id="emails"></div>
+		State:
+		<div class="output_div" id="state"></div>
+		Country:
+		<div class="output_div" id="country"></div>
+		Registrar:
+		<div class="output_div" id="registrar"></div>
+		Expiration Date:
+		<div class="output_div" id="expiration_date"></div>
+		Name Server(s):
+		<div class="output_div" id="name_servers"></div>
+	</p>
+	<script>
+		$('#form').on('submit', function(e){
+			
+			e.preventDefault();
+			
+			$.ajax({
+				type : "POST", 
+				url: "{% url 'whois_ip' %}",
+				data: {
+					ip_addr : $('#ip_addr').val(),
+					csrfmiddlewaretoken: '{{ csrf_token }}',
+					dataType: "json",
+				},
+				
+				success: function(data){
+					$('#domain_name').html(data.domain_name)
+					$('#org').html(data.org)
+					$('#emails').html(data.emails)
+					$('#state').html(data.state)
+					$('#country').html(data.country)
+					$('#registrar').html(data.registrar)
+					$('#expiration_date').html(data.expiration_date)
+					$('#name_servers').html(data.name_servers)
+				},
+			
+				failure: function() {
+					
+				}
+			});
+			
+			
+		});    
+	 </script>
+</body>
+</html>
