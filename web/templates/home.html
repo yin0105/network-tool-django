@@ -36,6 +36,10 @@
             }
             #output-inner-box {
                 height: calc( 100vh - 150px );
+                overflow: auto;
+            }
+            #output-inner-box::-webkit-scrollbar {
+                display: none; /* for Chrome, Safari, and Opera */
             }
         </style>
     </head>
@@ -55,10 +59,10 @@
                 <div class="col-sm-12 col-md-6 input-box">
                     <form>
                         <div class="row pt-4">
-                            <div class="col-md-2 offset-md-2 pt-2 text-right">
+                            <div class="col-md-3 offset-md-1 pt-2 text-right">
                                 <label for="command">Command : </label>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <select class="form-control" id="command">
                                     <option>whois</option>
                                     <option>nslookup</option>
@@ -101,6 +105,13 @@
                     
                     success: function(data){
                         console.log(data);
+                        let inner_html = "<table>";
+                        for (const item in data) {
+                            inner_html += "<tr><td style='color: aquamarine;'>" + item + "</td><td>" + data[item] + "</td></tr>";    
+                        }
+                        inner_html += "</table>";
+                        console.log("inner_html = ", inner_html)
+                        $("#output-inner-box").html (inner_html);
                     },
                 
                     failure: function() {

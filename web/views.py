@@ -20,6 +20,7 @@ def whois_ip(request):
             print(result)
             # result = os.system("whois {}".format(ip_addr))
             for line in result.splitlines():
+                if line.find(">>>") == 0: break
                 sublines = line.split(": ", 1)
                 if len(sublines) > 1:
                     if sublines[0] in resp_json:
