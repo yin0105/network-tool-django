@@ -4,7 +4,6 @@
         <meta charset="UTF-8">
         <title>darklab.sh - tools</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -12,7 +11,6 @@
         <style type="text/css">
             .output-box {
                 height: calc( 100vh - 100px );
-                /* border-radius: 20px; */
                 background-color: black;
                 color: white;
             }
@@ -28,7 +26,6 @@
             .container {
                 max-width: 100%;
                 height: calc( 100vh - 100px );
-                /* padding: 0px 20px 20px; */
             }
             .param-box {
                 max-width: 400px;
@@ -41,6 +38,18 @@
             #output-inner-box::-webkit-scrollbar {
                 display: none; /* for Chrome, Safari, and Opera */
             }
+            table, th, td {
+                border: 1px solid white;
+            }
+            th, td {
+                padding: 5px;
+            }
+            .help-block {
+                color: red;
+                font-size: 12px;
+                margin-top: 5px;
+            }
+            
         </style>
     </head>
     <body>
@@ -48,16 +57,10 @@
             <h1 class="text-center">darklab.sh - tools</h1>
         </div>
         <div class="container">
-            <!-- <nav>
-                <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
-                    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Project Tab 1</a>
-                    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Project Tab 2</a>
-                    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Project Tab 3</a>
-                </div>
-            </nav> -->
             <div class="row">
                 <div class="col-sm-12 col-md-6 input-box">
-                    <form>
+                    <form id="whois_form" name="whois_form">
+                        {% csrf_token %}
                         <div class="row pt-4">
                             <div class="col-md-3 offset-md-1 pt-2 text-right">
                                 <label for="command">Command : </label>
@@ -72,10 +75,9 @@
                             </div>
                         </div>
                         <div id="div-whois" class="param-box">
-                            <div class="form-group">
-                                <label for="whois_domain_name">Domain name : </label>
-                                <input type="text" class="form-control" id="whois_domain_name" placeholder="google.com">
-                              </div>
+                            <label for='{{ whois_form.whois_domain_name.name }}'>{{ whois_form.whois_domain_name.label }}</label>
+                            {{ whois_form.whois_domain_name }}
+                            <p class="help-block" id="whois_domain_name_error"></p>
                         </div>
                         <div class="text-center">
                             <button type="button" class="btn btn-primary" id="btn-run">RUN</button>
@@ -93,24 +95,35 @@
     </body>
     <script>
         $(document).ready(function(){
-            $("#btn-run").click(function(){    
+            $("#btn-run").click(function(){  
+                let form_data = $('#whois_form').serialize();
+                form_data["csrfmiddlewaretoken"] = '{{ csrf_token }}';
+                form_data["dataType"] = "json";
                 $.ajax({
                     type : "POST", 
                     url: "{% url 'whois_ip' %}",
-                    data: {
-                        ip_addr : $('#whois_domain_name').val(),
-                        csrfmiddlewaretoken: '{{ csrf_token }}',
-                        dataType: "json",
-                    },
+                    data: form_data,
                     
                     success: function(data){
-                        console.log(data);
                         let inner_html = "<table>";
-                        for (const item in data) {
-                            inner_html += "<tr><td style='color: aquamarine;'>" + item + "</td><td>" + data[item] + "</td></tr>";    
+
+                        if ("invalid" in data) {
+                            const invalid_feedback = JSON.parse(data["invalid"])
+                            if ("whois_domain_name" in invalid_feedback) {
+                                $("#whois_domain_name_error").text(invalid_feedback["whois_domain_name"][0]["message"])
+                            }
+                        } else {
+                            $("#whois_domain_name_error").text("");
+
+                            if ("error_msg" in data) {
+                                inner_html += "<tr><td class='pr-3' style='color: aquamarine;'>error: </td><td style='color: red;'>" + data["error_msg"] + "</td></tr>";    
+                            } else {
+                                for (const item in data) {
+                                    inner_html += "<tr><td class='pr-3' style='color: aquamarine;'>" + item + "</td><td>" + data[item] + "</td></tr>";    
+                                }
+                            }
                         }
                         inner_html += "</table>";
-                        console.log("inner_html = ", inner_html)
                         $("#output-inner-box").html (inner_html);
                     },
                 
